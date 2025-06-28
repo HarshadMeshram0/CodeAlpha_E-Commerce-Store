@@ -110,8 +110,8 @@
             color: white;
         }
         
-        .login-form {
-            max-width: 400px;
+        .login-form, .checkout-form {
+            max-width: 500px;
             margin: 50px auto;
             padding: 20px;
             background: white;
@@ -119,19 +119,40 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
-        .login-form input {
+        .login-form input, .checkout-form input {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
             border: 1px solid #ddd;
         }
         
-        .login-form button {
+        .login-form button, .checkout-form button {
             background-color: #febd69;
             border: none;
             padding: 10px;
             width: 100%;
             cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cart-total {
+            font-weight: bold;
+            font-size: 20px;
+            text-align: right;
+            margin-top: 20px;
+        }
+        
+        .checkout-btn {
+            background-color: #FF9900 !important;
+            color: white;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -157,50 +178,27 @@
     </footer>
 
     <script>
-        // Product Database
+        // Enhanced Product Database
         const products = [
-            {
-                id: 1,
-                name: "LG 1.5 Ton AC",
-                price: 34999,
-                category: "AC",
-                image: "https://m.media-amazon.com/images/I/61iL+ztPvIL._SL1500_.jpg"
-            },
-            {
-                id: 2,
-                name: "Samsung 55\" Smart TV",
-                price: 45999,
-                category: "TV",
-                image: "https://m.media-amazon.com/images/I/71RxCmvnrbL._SL1500_.jpg"
-            },
-            {
-                id: 3,
-                name: "iPhone 14 Pro",
-                price: 129999,
-                category: "Phone",
-                image: "https://m.media-amazon.com/images/I/61cwywLZR-L._SL1500_.jpg"
-            },
-            {
-                id: 4,
-                name: "OnePlus 11 5G",
-                price: 56999,
-                category: "Phone",
-                image: "https://m.media-amazon.com/images/I/61IhTtWSE4L._SL1500_.jpg"
-            },
-            {
-                id: 5,
-                name: "Sony Bravia 65\" TV",
-                price: 89999,
-                category: "TV",
-                image: "https://m.media-amazon.com/images/I/91Y8FqksOIL._SL1500_.jpg"
-            },
-            {
-                id: 6,
-                name: "Voltas 1 Ton AC",
-                price: 28999,
-                category: "AC",
-                image: "https://m.media-amazon.com/images/I/61D1Y1g6Q9L._SL1500_.jpg"
-            }
+            // ACs
+            { id: 1, name: "LG 1.5 Ton AC", price: 34999, category: "AC", brand: "LG", image: "https://m.media-amazon.com/images/I/61iL+ztPvIL._SL1500_.jpg" },
+            { id: 2, name: "Voltas 1 Ton AC", price: 28999, category: "AC", brand: "Voltas", image: "https://m.media-amazon.com/images/I/61D1Y1g6Q9L._SL1500_.jpg" },
+            
+            // TVs
+            { id: 3, name: "Samsung 55\" Smart TV", price: 45999, category: "TV", brand: "Samsung", image: "https://m.media-amazon.com/images/I/71RxCmvnrbL._SL1500_.jpg" },
+            { id: 4, name: "Xiaomi 50\" Android TV", price: 32999, category: "TV", brand: "Xiaomi", image: "https://m.media-amazon.com/images/I/71vZypjNkPS._SL1500_.jpg" },
+            
+            // Phones
+            { id: 5, name: "iPhone 14 Pro", price: 129999, category: "Phone", brand: "Apple", image: "https://m.media-amazon.com/images/I/61cwywLZR-L._SL1500_.jpg" },
+            { id: 6, name: "Samsung Galaxy S23", price: 84999, category: "Phone", brand: "Samsung", image: "https://m.media-amazon.com/images/I/61RZ0WdcRCL._SL1500_.jpg" },
+            { id: 7, name: "OnePlus 11 5G", price: 56999, category: "Phone", brand: "OnePlus", image: "https://m.media-amazon.com/images/I/61IhTtWSE4L._SL1500_.jpg" },
+            { id: 8, name: "Xiaomi 12 Pro", price: 49999, category: "Phone", brand: "Xiaomi", image: "https://m.media-amazon.com/images/I/61yY7J4XJ5L._SL1500_.jpg" },
+            { id: 9, name: "Realme 10 Pro+", price: 24999, category: "Phone", brand: "Realme", image: "https://m.media-amazon.com/images/I/71geVd6wA8L._SL1500_.jpg" },
+            { id: 10, name: "Redmi Note 12 Pro", price: 21999, category: "Phone", brand: "Redmi", image: "https://m.media-amazon.com/images/I/71geVd6wA8L._SL1500_.jpg" },
+            
+            // Laptops
+            { id: 11, name: "MacBook Air M1", price: 89999, category: "Laptop", brand: "Apple", image: "https://m.media-amazon.com/images/I/71TPda7cwUL._SL1500_.jpg" },
+            { id: 12, name: "Samsung Galaxy Book2", price: 64999, category: "Laptop", brand: "Samsung", image: "https://m.media-amazon.com/images/I/71q3JxgHDZL._SL1500_.jpg" }
         ];
 
         // User Credentials
@@ -224,6 +222,7 @@
         // Display Home Page
         function displayHomePage() {
             mainContent.innerHTML = `
+                <h2 style="padding: 20px 20px 0">Featured Products</h2>
                 <div class="products-grid" id="productsGrid">
                     ${products.map(product => `
                         <div class="product-card">
@@ -256,22 +255,32 @@
             const searchTerm = searchInput.value.toLowerCase();
             const filteredProducts = products.filter(product => 
                 product.name.toLowerCase().includes(searchTerm) || 
-                product.category.toLowerCase().includes(searchTerm)
+                product.category.toLowerCase().includes(searchTerm) ||
+                product.brand.toLowerCase().includes(searchTerm)
             );
             
-            document.getElementById('productsGrid').innerHTML = filteredProducts.map(product => `
-                <div class="product-card">
-                    <img src="${product.image}" alt="${product.name}">
-                    <h3>${product.name}</h3>
-                    <div class="price">₹${product.price.toLocaleString()}</div>
-                    <button onclick="addToCart(${product.id})">Add to Cart</button>
+            mainContent.innerHTML = `
+                <h2 style="padding: 20px 20px 0">Search Results</h2>
+                <div class="products-grid" id="productsGrid">
+                    ${filteredProducts.map(product => `
+                        <div class="product-card">
+                            <img src="${product.image}" alt="${product.name}">
+                            <h3>${product.name}</h3>
+                            <div class="price">₹${product.price.toLocaleString()}</div>
+                            <button onclick="addToCart(${product.id})">Add to Cart</button>
+                        </div>
+                    `).join('')}
                 </div>
-            `).join('');
+            `;
         }
 
         // Login System
         loginLink.addEventListener('click', function(e) {
             e.preventDefault();
+            showLoginForm();
+        });
+
+        function showLoginForm() {
             mainContent.innerHTML = `
                 <div class="login-form">
                     <h2>Login</h2>
@@ -280,7 +289,7 @@
                     <button onclick="login()">Login</button>
                 </div>
             `;
-        });
+        }
 
         function login() {
             const username = document.getElementById('username').value;
@@ -295,6 +304,128 @@
             } else {
                 alert("Invalid credentials! Try username: harshad, password: nagpur");
             }
+        }
+
+        // Cart Link Click Handler
+        cartLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showCart();
+        });
+
+        // Show Cart
+        function showCart() {
+            if (cart.length === 0) {
+                mainContent.innerHTML = `<h2 style="padding: 20px;">Your cart is empty</h2>`;
+                return;
+            }
+
+            let total = 0;
+            mainContent.innerHTML = `
+                <h2 style="padding: 20px;">Your Shopping Cart</h2>
+                <div style="padding: 0 20px;">
+                    ${cart.map(item => {
+                        total += item.price;
+                        return `
+                            <div class="cart-item">
+                                <div>
+                                    <h3>${item.name}</h3>
+                                    <div class="price">₹${item.price.toLocaleString()}</div>
+                                </div>
+                                <button onclick="removeFromCart(${item.id})">Remove</button>
+                            </div>
+                        `;
+                    }).join('')}
+                    <div class="cart-total">Total: ₹${total.toLocaleString()}</div>
+                    <button class="checkout-btn" onclick="showCheckoutForm()">Proceed to Checkout</button>
+                </div>
+            `;
+        }
+
+        // Remove from Cart
+        function removeFromCart(productId) {
+            const index = cart.findIndex(item => item.id === productId);
+            if (index !== -1) {
+                cart.splice(index, 1);
+                showCart();
+                updateCartCount();
+            }
+        }
+
+        // Show Checkout Form
+        function showCheckoutForm() {
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
+            
+            mainContent.innerHTML = `
+                <div class="checkout-form">
+                    <h2>Checkout</h2>
+                    <h3>Order Summary</h3>
+                    <ul style="margin: 10px 0 20px; padding-left: 20px;">
+                        ${cart.map(item => `<li>${item.name} - ₹${item.price.toLocaleString()}</li>`).join('')}
+                    </ul>
+                    <div style="font-weight: bold; margin-bottom: 20px;">Total: ₹${total.toLocaleString()}</div>
+                    
+                    <h3>Shipping Information</h3>
+                    <input type="text" id="name" placeholder="Full Name">
+                    <input type="text" id="address" placeholder="Shipping Address">
+                    <input type="text" id="city" placeholder="City">
+                    <input type="text" id="state" placeholder="State">
+                    <input type="text" id="pincode" placeholder="Pincode">
+                    <input type="tel" id="phone" placeholder="Phone Number">
+                    
+                    <h3 style="margin-top: 20px;">Payment Method</h3>
+                    <select id="paymentMethod" style="width: 100%; padding: 10px; margin: 10px 0;">
+                        <option value="cod">Cash on Delivery</option>
+                        <option value="card">Credit/Debit Card</option>
+                        <option value="upi">UPI</option>
+                    </select>
+                    
+                    <button onclick="placeOrder()">Place Order</button>
+                </div>
+            `;
+        }
+
+        // Place Order
+        function placeOrder() {
+            const name = document.getElementById('name').value;
+            const address = document.getElementById('address').value;
+            
+            if (!name || !address) {
+                alert("Please fill all required fields!");
+                return;
+            }
+
+            const order = {
+                items: [...cart],
+                total: cart.reduce((sum, item) => sum + item.price, 0),
+                shipping: {
+                    name,
+                    address: document.getElementById('address').value,
+                    city: document.getElementById('city').value,
+                    state: document.getElementById('state').value,
+                    pincode: document.getElementById('pincode').value,
+                    phone: document.getElementById('phone').value
+                },
+                paymentMethod: document.getElementById('paymentMethod').value,
+                date: new Date().toLocaleString()
+            };
+
+            // In a real app, you would send this to a server
+            console.log("Order placed:", order);
+            
+            // Show confirmation
+            mainContent.innerHTML = `
+                <div style="padding: 20px; text-align: center;">
+                    <h2>Order Placed Successfully!</h2>
+                    <p>Thank you for your purchase, ${order.shipping.name}!</p>
+                    <p>Order Total: ₹${order.total.toLocaleString()}</p>
+                    <p>Estimated Delivery: 3-5 business days</p>
+                    <button onclick="displayHomePage()" style="margin-top: 20px;">Continue Shopping</button>
+                </div>
+            `;
+            
+            // Clear cart
+            cart = [];
+            updateCartCount();
         }
     </script>
 </body>
