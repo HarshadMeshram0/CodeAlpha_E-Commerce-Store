@@ -35,4 +35,10 @@
         "price": 12.99,
         "image": "https://via.placeholder.com/200"
     }
+{
+  "id": 7,
+  "name": "New Product",
+  "price": 99.99,
+  "image": "path/to/image.jpg"
+}
 ]
