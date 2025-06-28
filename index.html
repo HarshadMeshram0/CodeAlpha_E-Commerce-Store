@@ -4,31 +4,298 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amazon Clone | Harshad Meshram</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f3f3f3;
+        }
+        
+        header {
+            background-color: #232f3e;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .search {
+            display: flex;
+            width: 50%;
+            margin-bottom: 10px;
+        }
+        
+        .search input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+        }
+        
+        .search button {
+            padding: 10px 15px;
+            background-color: #febd69;
+            border: none;
+            cursor: pointer;
+        }
+        
+        nav a {
+            color: white;
+            margin-left: 15px;
+            text-decoration: none;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 5px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: scale(1.03);
+        }
+        
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+        }
+        
+        .product-card h3 {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        
+        .product-card .price {
+            color: #b12704;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .product-card button {
+            background-color: #ffd814;
+            border: none;
+            padding: 8px 15px;
+            margin-top: 10px;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 3px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #232f3e;
+            color: white;
+        }
+        
+        .login-form {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .login-form input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+        }
+        
+        .login-form button {
+            background-color: #febd69;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <header>
         <div class="logo">Amazon Clone</div>
         <div class="search">
-            <input type="text" placeholder="Search products...">
-            <button>Search</button>
+            <input type="text" id="searchInput" placeholder="Search products...">
+            <button onclick="searchProducts()">Search</button>
         </div>
         <nav>
-            <a href="#">Account</a>
-            <a href="cart.html">Cart (0)</a>
+            <a href="#" id="loginLink">Account</a>
+            <a href="#" id="cartLink">Cart (0)</a>
         </nav>
     </header>
 
-    <main>
-        <div class="products-grid" id="products">
-            <!-- Products load here -->
-        </div>
+    <main id="mainContent">
+        <!-- Content will be loaded here -->
     </main>
 
     <footer>
         <p>© 2023 Amazon Clone by Harshad Meshram</p>
     </footer>
 
-    <script src="script.js"></script>
+    <script>
+        // Product Database
+        const products = [
+            {
+                id: 1,
+                name: "LG 1.5 Ton AC",
+                price: 34999,
+                category: "AC",
+                image: "https://m.media-amazon.com/images/I/61iL+ztPvIL._SL1500_.jpg"
+            },
+            {
+                id: 2,
+                name: "Samsung 55\" Smart TV",
+                price: 45999,
+                category: "TV",
+                image: "https://m.media-amazon.com/images/I/71RxCmvnrbL._SL1500_.jpg"
+            },
+            {
+                id: 3,
+                name: "iPhone 14 Pro",
+                price: 129999,
+                category: "Phone",
+                image: "https://m.media-amazon.com/images/I/61cwywLZR-L._SL1500_.jpg"
+            },
+            {
+                id: 4,
+                name: "OnePlus 11 5G",
+                price: 56999,
+                category: "Phone",
+                image: "https://m.media-amazon.com/images/I/61IhTtWSE4L._SL1500_.jpg"
+            },
+            {
+                id: 5,
+                name: "Sony Bravia 65\" TV",
+                price: 89999,
+                category: "TV",
+                image: "https://m.media-amazon.com/images/I/91Y8FqksOIL._SL1500_.jpg"
+            },
+            {
+                id: 6,
+                name: "Voltas 1 Ton AC",
+                price: 28999,
+                category: "AC",
+                image: "https://m.media-amazon.com/images/I/61D1Y1g6Q9L._SL1500_.jpg"
+            }
+        ];
+
+        // User Credentials
+        const users = [
+            { username: "harshad", password: "nagpur" }
+        ];
+
+        // Cart System
+        let cart = [];
+        let currentUser = null;
+
+        // DOM Elements
+        const mainContent = document.getElementById('mainContent');
+        const loginLink = document.getElementById('loginLink');
+        const cartLink = document.getElementById('cartLink');
+        const searchInput = document.getElementById('searchInput');
+
+        // Initialize
+        displayHomePage();
+
+        // Display Home Page
+        function displayHomePage() {
+            mainContent.innerHTML = `
+                <div class="products-grid" id="productsGrid">
+                    ${products.map(product => `
+                        <div class="product-card">
+                            <img src="${product.image}" alt="${product.name}">
+                            <h3>${product.name}</h3>
+                            <div class="price">₹${product.price.toLocaleString()}</div>
+                            <button onclick="addToCart(${product.id})">Add to Cart</button>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            updateCartCount();
+        }
+
+        // Add to Cart
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            cart.push(product);
+            updateCartCount();
+            alert(`${product.name} added to cart!`);
+        }
+
+        // Update Cart Count
+        function updateCartCount() {
+            cartLink.textContent = `Cart (${cart.length})`;
+        }
+
+        // Search Products
+        function searchProducts() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filteredProducts = products.filter(product => 
+                product.name.toLowerCase().includes(searchTerm) || 
+                product.category.toLowerCase().includes(searchTerm)
+            );
+            
+            document.getElementById('productsGrid').innerHTML = filteredProducts.map(product => `
+                <div class="product-card">
+                    <img src="${product.image}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <div class="price">₹${product.price.toLocaleString()}</div>
+                    <button onclick="addToCart(${product.id})">Add to Cart</button>
+                </div>
+            `).join('');
+        }
+
+        // Login System
+        loginLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            mainContent.innerHTML = `
+                <div class="login-form">
+                    <h2>Login</h2>
+                    <input type="text" id="username" placeholder="Username">
+                    <input type="password" id="password" placeholder="Password">
+                    <button onclick="login()">Login</button>
+                </div>
+            `;
+        });
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                alert("Login successful! Welcome back, Harshad!");
+                displayHomePage();
+            } else {
+                alert("Invalid credentials! Try username: harshad, password: nagpur");
+            }
+        }
+    </script>
 </body>
 </html>
